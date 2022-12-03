@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 
 *.DS_Store
+/weibospider/cookie_private.txt

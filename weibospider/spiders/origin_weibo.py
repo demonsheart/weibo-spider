@@ -1,6 +1,5 @@
 import scrapy
 import json
-from scrapy import Spider
 from scrapy.http import Request
 from weibospider.items import OriginWeiboItem
 
