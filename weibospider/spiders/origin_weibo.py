@@ -20,7 +20,26 @@ class OriginWeiboSpider(scrapy.Spider):
 
     def parse(self, response):
         data = json.loads(response.text)
-        print(data)
+        blocs = data['data']['list']
+        for bloc in blocs:
+            origin_weibo_id = bloc['id']  # 源微博id
+            # 这里user也可以单独试着存一下
+            origin_user_id = bloc['user']['id']  # 源用户id
+            origin_weibo_content = bloc['text_raw']  # 源微博文本内容
+            publish_time = bloc['created_at']  # 发布时间
+            repost_count = bloc['reposts_count']  # 转发数
+            like_count = bloc['attitudes_count']  # 点赞数
+
+            item = OriginWeiboItem()
+            item['origin_weibo_id'] = origin_weibo_id
+            item['origin_user_id'] = origin_user_id
+            item['origin_weibo_content'] = origin_weibo_content
+            item['publish_time'] = publish_time
+            item['repost_count'] = repost_count
+            item['like_count'] = like_count
+            print(item)
+            print("\n\n")
+            yield item
 
 # class DouyuSpider(scrapy.Spider):
 #     name = 'douyu'
