@@ -29,6 +29,6 @@ class RepostWeiboItem(scrapy.Item):
 # 用户信息文件
 class UserInfoItem(scrapy.Item):
     user_id = scrapy.Field()  # 用户id
-    followee_count = scrapy.Field()  # 关注数
-    follower_count = scrapy.Field()  # 粉丝数
+    friends_count = scrapy.Field()  # 关注数
+    followers_count = scrapy.Field()  # 粉丝数
     statuses_count = scrapy.Field()  # 微博数

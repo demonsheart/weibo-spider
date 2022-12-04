@@ -1,6 +1,7 @@
 import json
 import dateutil.parser
 from weibospider.items import OriginWeiboItem
+from weibospider.items import RepostWeiboItem
 
 
 def parse_time(s):
@@ -20,6 +21,15 @@ def parse_bloc(bloc):
     item['like_count'] = bloc['attitudes_count']  # 点赞数
     return item
 
+def parse_repost_bloc(bloc):
+    item = RepostWeiboItem()
+    item['origin_weibo_id'] = str(bloc['retweeted_status']['id'])  # 源微博id
+    item['origin_user_id'] = str(bloc['retweeted_status']['user']['id'])  # 源用户id
+    item['repost_weibo_id'] = str(bloc['id'])  # 转发微博id
+    item['repost_user_id'] = str(bloc['user']['id'])  # 转发用户id
+    item['repost_weibo_content'] = bloc['text_raw']  # 转发正文
+    item['repost_publish_time'] = parse_time(bloc['created_at'])  # 转发时间
+    return item
 
 def parse_long_bloc(response):
     """
