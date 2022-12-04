@@ -8,4 +8,5 @@ python环境: python >= 3.7
 ```bash
 pip install -r requirements.txt
 scrapy crawl origin_weibo 
+scrapy crawl origin_weibo -a max_page=5 # 做了参数定义
 ```
