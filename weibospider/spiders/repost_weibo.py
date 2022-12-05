@@ -4,6 +4,7 @@ from scrapy.http import Request
 
 from weibospider.mytools.common import parse_repost_bloc, parse_long_bloc
 
+
 class RepostWeiboSpider(scrapy.Spider):
     name = 'repost_weibo'
     # allowed_domains = ['weibo.com']
@@ -33,4 +34,4 @@ class RepostWeiboSpider(scrapy.Spider):
                 if page_num <= int(self.max_page):
                     yield Request(url, callback=self.parse, meta={'pid': pid, 'page_num': page_num})
             else:  # 无限制请求
-                yield Request(url, callback=self.parse, meta={'pid': pid, 'page_num': page_num})    
+                yield Request(url, callback=self.parse, meta={'pid': pid, 'page_num': page_num})
