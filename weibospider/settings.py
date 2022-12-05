@@ -12,6 +12,11 @@ BOT_NAME = 'weibospider'
 SPIDER_MODULES = ['weibospider.spiders']
 NEWSPIDER_MODULE = 'weibospider.spiders'
 
+# Retry
+RETRY_ENABLED = True
+RETRY_TIMES = 5
+RETRY_HTTP_CODES = [500, 503, 504, 400, 408]
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'weibospider (+http://www.yourdomain.com)'
 
