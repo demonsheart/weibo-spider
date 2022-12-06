@@ -2,7 +2,6 @@ import scrapy
 import json
 from diskcache import Cache
 from scrapy.http import Request
-from weibospider.spiders.repost_weibo import RepostWeiboSpider
 from weibospider.items import UserInfoItem
 from weibospider.mytools.common import parse_bloc, parse_long_bloc, parse_repost_bloc
 from weibospider import private_setting
@@ -70,7 +69,8 @@ class OriginWeiboSpider(scrapy.Spider):
             user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
             yield Request(user_url, callback=self.parse_user)
         else:
-            pass    
+            # print("这是测试输出 这是测试输出 这是测试输出 这是测试输出 这是测试输出 这是测试输出")   
+            pass
 
     def parse(self, response, **kwargs):
         self.logger.info('Parse function called on %s', response.url)
