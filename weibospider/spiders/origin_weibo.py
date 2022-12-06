@@ -129,7 +129,7 @@ class OriginWeiboSpider(scrapy.Spider):
             page_num += 1
             url = f"https://weibo.com/ajax/statuses/repostTimeline?page={page_num}&moduleID=feed&id={mid}"
             if page_num <= 100:  # 转发推文请求限制页数
-                self.repost_pages[mid] = page_num
+                self.repost_ids_pages[mid] = page_num
                 yield Request(url, callback=self.parse_repost, meta={'mid': mid, 'page_num': page_num})
 
     def close(self, reason):
