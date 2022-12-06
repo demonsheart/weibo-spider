@@ -9,6 +9,7 @@ import pymysql
 class RepostWeiboSpider(scrapy.Spider):
     connect = None
     cursor = None
+
     def open_spider(self, spider):
         self.connect = pymysql.connect(
             host=private_setting.MYSQL_HOST,
@@ -18,6 +19,7 @@ class RepostWeiboSpider(scrapy.Spider):
             charset='utf8mb4'
         )
         self.cursor = self.connect.cursor()
+
     def process_item(self, user_id):
         database = 'use weibo_datas;'
         sql = 'select * from user_info where user_id = %s'

@@ -1,11 +1,13 @@
 import scrapy
 import json
+import pymysql
+
 from diskcache import Cache
 from scrapy.http import Request
 from weibospider.items import UserInfoItem
 from weibospider.mytools.common import parse_bloc, parse_long_bloc, parse_repost_bloc
 from weibospider import private_setting
-import pymysql
+from scrapy.mail import MailSender
 
 
 # scrapy crawl origin_weibo -a max_page=5 -a reset_page=True
@@ -77,7 +79,7 @@ class OriginWeiboSpider(scrapy.Spider):
             else:
                 yield item
             # 对每一条微博 请求转发它的微博 为了简化 每次从第一页开始请求
-            # TODO 必须也得缓存当前的page 因为有的微博转发数量也很大 当cookie挂了重新爬取的时候 需要恢复现场
+            # 必须也得缓存当前的page 因为有的微博转发数量也很大 当cookie挂了重新爬取的时候 需要恢复现场
             mid = str(bloc['mid'])
             if self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid):
                 repost_page = self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid)['weibo_repost_pages']
@@ -134,7 +136,10 @@ class OriginWeiboSpider(scrapy.Spider):
                 yield Request(url, callback=self.parse_repost, meta={'mid': mid, 'page_num': page_num})
 
     def close(self, reason):
-        # TODO: 爬虫停止则发送邮件通知
+        # 爬虫停止则发送邮件通知
+        mailer = MailSender.from_settings(self.settings)
+        mailer.send(to=["2509875617@qq.com"], subject="Scrapy Pause", body="请更新cookie",
+                    cc=["2509875617@qq.com"])
 
         # 同时记录当前的{userid : page} 下次启动入口时从page开始
         self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
