@@ -20,7 +20,6 @@ class OriginWeiboSpider(scrapy.Spider):
     user_ids = ['6239620007']  # 深圳大学的pid
     SAVED_PAGE_KEY = 'weibo_downloaded_pages'
     SAVED_REPOST_PAGE_KEY = 'weibo_repost_pages'
-    repost_pages = {SAVED_REPOST_PAGE_KEY: 1}
 
     def __init__(self, max_page=None, reset_page=False, *args, **kwargs):
         super(OriginWeiboSpider, self).__init__(*args, **kwargs)
@@ -32,6 +31,7 @@ class OriginWeiboSpider(scrapy.Spider):
         if reset_page:
             self.cache.set(self.SAVED_PAGE_KEY, {key: 1 for key in self.user_ids})
         self.user_ids_pages = self.cache.get(self.SAVED_PAGE_KEY, default={key: 1 for key in self.user_ids})
+        self.repost_ids_pages = self.cache.get(self.SAVED_REPOST_PAGE_KEY, default={})
         self.open_connect()
 
     def open_connect(self):
@@ -81,10 +81,7 @@ class OriginWeiboSpider(scrapy.Spider):
             # 对每一条微博 请求转发它的微博 为了简化 每次从第一页开始请求
             # 必须也得缓存当前的page 因为有的微博转发数量也很大 当cookie挂了重新爬取的时候 需要恢复现场
             mid = str(bloc['mid'])
-            if self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid):
-                repost_page = self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid)['weibo_repost_pages']
-            else:
-                repost_page = 1
+            repost_page = self.repost_ids_pages[mid] if mid in self.repost_ids_pages else 1
 
             repost_url = f'https://weibo.com/ajax/statuses/repostTimeline?page={repost_page}&moduleID=feed&id={mid}'
             yield Request(repost_url, callback=self.parse_repost, meta={'page_num': repost_page, 'mid': mid})
@@ -143,5 +140,5 @@ class OriginWeiboSpider(scrapy.Spider):
 
         # 同时记录当前的{userid : page} 下次启动入口时从page开始
         self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
-        self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_pages)
+        self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_ids_pages)
         self.connect.close()
