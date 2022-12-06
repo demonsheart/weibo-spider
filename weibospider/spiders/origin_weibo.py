@@ -20,6 +20,7 @@ class OriginWeiboSpider(scrapy.Spider):
         super(OriginWeiboSpider, self).__init__(*args, **kwargs)
         self.max_page = max_page
 
+        # TODO 目前是通过项目的disk下的db缓存当前的page_num 这需要每次都更新本地的disk 这里可以使用云redis优化
         # 根据cache初始化user_ids_pages 从上一次失败的page开始爬起
         self.cache = Cache(r"weibospider/disk")
         if reset_page:
@@ -51,6 +52,7 @@ class OriginWeiboSpider(scrapy.Spider):
             else:
                 yield item
             # 对每一条微博 请求转发它的微博 为了简化 每次从第一页开始请求
+            # TODO 必须也得缓存当前的page 因为有的微博转发数量也很大 当cookie挂了重新爬取的时候 需要恢复现场
             mid = str(bloc['mid'])
             repost_url = f'https://weibo.com/ajax/statuses/repostTimeline?page=1&moduleID=feed&id={mid}'
             yield Request(repost_url, callback=self.parse_repost, meta={'mid': mid, 'page_num': 1})
