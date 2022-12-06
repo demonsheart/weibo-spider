@@ -2,9 +2,11 @@ import scrapy
 import json
 from diskcache import Cache
 from scrapy.http import Request
-
+from weibospider.spiders.repost_weibo import RepostWeiboSpider
 from weibospider.items import UserInfoItem
 from weibospider.mytools.common import parse_bloc, parse_long_bloc, parse_repost_bloc
+from weibospider import private_setting
+import pymysql
 
 
 # scrapy crawl origin_weibo -a max_page=5 -a reset_page=True
@@ -12,10 +14,12 @@ class OriginWeiboSpider(scrapy.Spider):
     name = 'origin_weibo'
     # allowed_domains = ['weibo.com']
     base_url = "https://weibo.com"  # 微博的接口
-
+    connect = None
+    cursor = None
     user_ids = ['6239620007']  # 深圳大学的pid
     SAVED_PAGE_KEY = 'weibo_downloaded_pages'
-
+    SAVED_REPOST_PAGE_KEY = 'weibo_repost_pages'
+    repost_pages = {SAVED_REPOST_PAGE_KEY:1} 
     def __init__(self, max_page=None, reset_page=False, *args, **kwargs):
         super(OriginWeiboSpider, self).__init__(*args, **kwargs)
         self.max_page = max_page
@@ -26,6 +30,30 @@ class OriginWeiboSpider(scrapy.Spider):
         if reset_page:
             self.cache.set(self.SAVED_PAGE_KEY, {key: 1 for key in self.user_ids})
         self.user_ids_pages = self.cache.get(self.SAVED_PAGE_KEY, default={key: 1 for key in self.user_ids})
+        self.open_connect()
+        
+
+    def open_connect(self):
+        self.connect = pymysql.connect(
+            host=private_setting.MYSQL_HOST,
+            db=private_setting.MYSQL_DATABASE,
+            user=private_setting.MYSQL_USERNAME,
+            passwd=private_setting.MYSQL_PASSWORD,
+            charset='utf8mb4'
+        )
+        self.cursor = self.connect.cursor()
+
+    def process_item(self, user_id):
+        database = 'use weibo_datas;'
+        sql = 'select * from user_info where user_id = %s'
+        data = user_id
+        self.cursor.execute(database)
+        self.cursor.execute(sql, data)
+        ret = self.cursor.fetchone()
+        if ret:
+            return True
+        else:
+            return False
 
     def start_requests(self):
         # 这里user_ids可替换成实际待采集的数据
@@ -38,8 +66,11 @@ class OriginWeiboSpider(scrapy.Spider):
 
     def request_user(self, user_id):
         # TODO 请求user会极大拖慢整个爬虫 需要对已经爬取过的user进行过滤 即需要做user_id持久化
-        user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
-        yield Request(user_url, callback=self.parse_user)
+        if self.process_item(user_id)==False:
+            user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
+            yield Request(user_url, callback=self.parse_user)
+        else:
+            pass    
 
     def parse(self, response, **kwargs):
         self.logger.info('Parse function called on %s', response.url)
@@ -58,8 +89,13 @@ class OriginWeiboSpider(scrapy.Spider):
             # 对每一条微博 请求转发它的微博 为了简化 每次从第一页开始请求
             # TODO 必须也得缓存当前的page 因为有的微博转发数量也很大 当cookie挂了重新爬取的时候 需要恢复现场
             mid = str(bloc['mid'])
-            repost_url = f'https://weibo.com/ajax/statuses/repostTimeline?page=1&moduleID=feed&id={mid}'
-            yield Request(repost_url, callback=self.parse_repost, meta={'mid': mid, 'page_num': 1})
+            if self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid):
+                repost_page=self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid)
+            else:
+                repost_page=1   
+   
+            repost_url = f'https://weibo.com/ajax/statuses/repostTimeline?page={repost_page}&moduleID=feed&id={mid}'
+            yield Request(repost_url, callback=self.parse_repost, meta={'page_num': repost_page,'mid': mid})
 
         # 如果还有数据 就尝试请求下一页数据
         if len(blocs) > 0:
@@ -101,6 +137,7 @@ class OriginWeiboSpider(scrapy.Spider):
             page_num += 1
             url = f"https://weibo.com/ajax/statuses/repostTimeline?page={page_num}&moduleID=feed&id={mid}"
             if page_num <= 100:  # 转发推文请求限制页数
+                self.repost_pages[mid]=page_num
                 yield Request(url, callback=self.parse_repost, meta={'mid': mid, 'page_num': page_num})
 
     def close(self, reason):
@@ -108,3 +145,6 @@ class OriginWeiboSpider(scrapy.Spider):
 
         # 同时记录当前的{userid : page} 下次启动入口时从page开始
         self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
+        self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_pages)
+        self.connect.commit()
+        self.connect.close()

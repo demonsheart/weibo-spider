@@ -1,11 +1,39 @@
 import scrapy
 import json
 from scrapy.http import Request
-
+from weibospider import private_setting
 from weibospider.mytools.common import parse_repost_bloc, parse_long_bloc
+import pymysql
 
 
 class RepostWeiboSpider(scrapy.Spider):
+    connect = None
+    cursor = None
+    def open_spider(self, spider):
+        self.connect = pymysql.connect(
+            host=private_setting.MYSQL_HOST,
+            db=private_setting.MYSQL_DATABASE,
+            user=private_setting.MYSQL_USERNAME,
+            passwd=private_setting.MYSQL_PASSWORD,
+            charset='utf8mb4'
+        )
+        self.cursor = self.connect.cursor()
+    def process_item(self, user_id):
+        database = 'use weibo_datas;'
+        sql = 'select * from user_info where user_id = %s'
+        data = user_id
+        self.cursor.execute(database)
+        self.cursor.execute(sql, data)
+        ret = self.cursor.fetchone()
+        if ret:
+            return True
+        else:
+            return False
+
+    def close_spider(self, spider):
+        self.connect.commit()
+        self.connect.close()
+
     name = 'repost_weibo'
     # allowed_domains = ['weibo.com']
     base_url = "https://weibo.com/ajax/statuses/repostTimeline"  # 微博的接口
