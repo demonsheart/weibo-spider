@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 *.DS_Store
-/weibospider/cookie_private.txt
-/weibospider/private_setting.py
+cookie_private.txt
+private_setting.py

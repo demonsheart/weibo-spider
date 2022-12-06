@@ -17,15 +17,6 @@ RETRY_ENABLED = True
 RETRY_TIMES = 3
 RETRY_HTTP_CODES = [500, 503, 504, 400, 408]
 
-# email
-MAIL_FROM = "a2509875617@163.com"
-MAIL_HOST = 'smtp.163.com'
-MAIL_PORT = 25
-MAIL_USER = 'a2509875617@163.com'
-MAIL_PASS = 'JWHKIWYNDTJWMXDQ'
-MAIL_TLS = False
-MAIL_SSL = False
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'weibospider (+http://www.yourdomain.com)'
 
