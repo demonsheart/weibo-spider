@@ -34,8 +34,12 @@ class OriginWeiboSpider(scrapy.Spider):
             url = f"https://weibo.com/ajax/statuses/mymblog?uid={user_id}&page={self.user_ids_pages[user_id]}"
             yield Request(url, callback=self.parse, meta={'user_id': user_id, 'page_num': self.user_ids_pages[user_id]})
             # 请求user信息
-            user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
-            yield Request(user_url, callback=self.parse_user)
+            self.request_user(user_id)
+
+    def request_user(self, user_id):
+        # TODO 请求user会极大拖慢整个爬虫 需要对已经爬取过的user进行过滤 即需要做user_id持久化
+        user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
+        yield Request(user_url, callback=self.parse_user)
 
     def parse(self, response, **kwargs):
         self.logger.info('Parse function called on %s', response.url)
@@ -90,8 +94,7 @@ class OriginWeiboSpider(scrapy.Spider):
             yield item
             # 对每一个转发的微博 请求其user信息
             user_id = str(bloc['user']['id'])
-            user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
-            yield Request(user_url, callback=self.parse_user)
+            self.request_user(user_id)
         # 如果还有数据 就尝试请求下一页数据
         if len(blocs) > 0:
             mid, page_num = response.meta['mid'], response.meta['page_num']
