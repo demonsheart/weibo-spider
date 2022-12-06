@@ -65,6 +65,8 @@ class OriginWeiboSpider(scrapy.Spider):
 
     def request_user(self, user_id):
         # TODO 请求user会极大拖慢整个爬虫 需要对已经爬取过的user进行过滤 即需要做user_id持久化
+        # print("这是测试输出 这是测试输出 这是测试输出 这是测试输出 这是测试输出 这是测试输出")   
+
         if self.process_item(user_id)==False:
             user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
             yield Request(user_url, callback=self.parse_user)
@@ -90,7 +92,7 @@ class OriginWeiboSpider(scrapy.Spider):
             # TODO 必须也得缓存当前的page 因为有的微博转发数量也很大 当cookie挂了重新爬取的时候 需要恢复现场
             mid = str(bloc['mid'])
             if self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid):
-                repost_page=self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid)
+                repost_page=self.cache.get(self.SAVED_REPOST_PAGE_KEY, mid)['weibo_repost_pages']
             else:
                 repost_page=1   
    
