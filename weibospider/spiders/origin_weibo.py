@@ -1,3 +1,5 @@
+import time
+
 import scrapy
 import json
 import pymysql
@@ -91,12 +93,16 @@ class OriginWeiboSpider(scrapy.Spider):
             user_id, page_num = response.meta['user_id'], response.meta['page_num']
             page_num += 1
             url = f"https://weibo.com/ajax/statuses/mymblog?uid={user_id}&page={page_num}"
+            # weibo降低频率
+            time.sleep(1)
             if self.max_page:  # max_page限制
                 if page_num <= int(self.max_page):
                     self.user_ids_pages[user_id] = page_num
+                    self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
                     yield Request(url, callback=self.parse, meta={'user_id': user_id, 'page_num': page_num})
             else:  # 无限制请求
                 self.user_ids_pages[user_id] = page_num
+                self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
                 yield Request(url, callback=self.parse, meta={'user_id': user_id, 'page_num': page_num})
 
     def parse_user(self, response):
@@ -130,6 +136,7 @@ class OriginWeiboSpider(scrapy.Spider):
             url = f"https://weibo.com/ajax/statuses/repostTimeline?page={page_num}&moduleID=feed&id={mid}"
             if page_num <= 100:  # 转发推文请求限制页数
                 self.repost_ids_pages[mid] = page_num
+                self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_ids_pages)
                 yield Request(url, callback=self.parse_repost, meta={'mid': mid, 'page_num': page_num})
 
     def close(self, reason):
