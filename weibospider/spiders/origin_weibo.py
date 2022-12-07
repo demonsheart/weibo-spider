@@ -142,11 +142,12 @@ class OriginWeiboSpider(scrapy.Spider):
     def close(self, reason):
         # 爬虫停止则发送邮件通知
         mailer = MailSender(smtphost=private_setting.MAIL_HOST,
-                            smtpport=private_setting.MAIL_HOST,
+                            smtpport=private_setting.MAIL_PORT,
                             smtpuser=private_setting.MAIL_USER,
                             smtppass=private_setting.MAIL_PASS,
                             smtpssl=private_setting.MAIL_SSL,
-                            smtptls=private_setting.MAIL_TLS)
+                            smtptls=private_setting.MAIL_TLS,
+                            mailfrom=private_setting.MAIL_FROM)
         mailer.send(to=["2509875617@qq.com"], subject="Scrapy Pause", body="请更新cookie",
                     cc=["2509875617@qq.com"])
 
