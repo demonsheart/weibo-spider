@@ -9,5 +9,5 @@ from diskcache import Cache
 
 cache = Cache(r"weibospider/disk")
 res = cache.get('weibo_repost_pages', default={})
-print(res)
-print("\n\n")
+# print(res)
+# print("\n\n")

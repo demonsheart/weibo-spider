@@ -32,3 +32,12 @@ class UserInfoItem(scrapy.Item):
     friends_count = scrapy.Field()  # 关注数
     followers_count = scrapy.Field()  # 粉丝数
     statuses_count = scrapy.Field()  # 微博数
+
+class WeiboHotSearchItem(scrapy.Item):
+    origin_weibo_id = scrapy.Field()  # 源微博id
+    origin_user_id = scrapy.Field()  # 源用户id
+    origin_weibo_content = scrapy.Field()  # 源微博文本内容
+    publish_time = scrapy.Field()  # 发布时间
+    repost_count = scrapy.Field()  # 转发数
+    like_count = scrapy.Field()  # 点赞数
+
