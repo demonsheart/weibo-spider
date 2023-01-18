@@ -22,7 +22,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
     # 1：#阳性感染者只咳嗽发烧算无症状吗#
     # 2：#二次感染新冠会更严重吗#
     # 3：#上班阳了算工伤吗#
-    key_words = [urllib.parse.quote('#上班阳了算工伤吗#')]
+    key_words = [urllib.parse.quote('#阳性感染者只咳嗽发烧算无症状吗#')]
 
     def __init__(self, max_page=None, reset_page=False, *args, **kwargs):
         super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
