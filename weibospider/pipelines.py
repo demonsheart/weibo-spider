@@ -59,7 +59,7 @@ class WeibospiderPipeline:
                      item['repost_count'], item['like_count'], item['origin_weibo_id'])
             sql = 'INSERT INTO weibo_hotsearch(origin_weibo_id, origin_user_id, origin_weibo_content,publish_time,repost_count,like_count)VALUES(%s,%s,%s,%s,%s,%s) '
             data = (item['origin_weibo_id'], item['origin_user_id'], item['origin_weibo_content'], item['publish_time'],
-                    item['repost_count'], item['like_count'])    
+                    item['repost_count'], item['like_count'])
         elif isinstance(item, weibospider.items.HotSearchRepostWeiboItem):
             sql2 = 'select * from repost_weibo_hotsearch where repost_weibo_id = %s'
             data2 = item['repost_weibo_id']
@@ -75,7 +75,7 @@ class WeibospiderPipeline:
             sql3 = 'update user_info_hotsearch set friends_count=%s, followers_count=%s,statuses_count =%s where user_id = %s'
             data3 = (item['friends_count'], item['followers_count'], item['statuses_count'], item['user_id'])
             sql = 'INSERT INTO user_info_hotsearch(user_id, friends_count, followers_count,statuses_count)VALUES(%s,%s,%s,%s) '
-            data = (item['user_id'], item['friends_count'], item['followers_count'], item['statuses_count'])            
+            data = (item['user_id'], item['friends_count'], item['followers_count'], item['statuses_count'])
         try:
             self.cursor.execute(database)
             self.cursor.execute(sql2, data2)
