@@ -62,8 +62,6 @@ class HotsearchUserInfoItem(scrapy.Item):
 
 class HotBandItem(scrapy.Item):
     num = scrapy.Field()  # id
-    subject_querys = scrapy.Field()  # 主题
-    subject_label = scrapy.Field()  # 主题
     word = scrapy.Field()  # 热榜关键词
     onboard_time = scrapy.Field()  # 时间
     raw_hot = scrapy.Field()  # 热度

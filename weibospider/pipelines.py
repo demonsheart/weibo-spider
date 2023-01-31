@@ -76,6 +76,8 @@ class WeibospiderPipeline:
             data3 = (item['friends_count'], item['followers_count'], item['statuses_count'], item['user_id'])
             sql = 'INSERT INTO user_info_hotsearch(user_id, friends_count, followers_count,statuses_count)VALUES(%s,%s,%s,%s) '
             data = (item['user_id'], item['friends_count'], item['followers_count'], item['statuses_count'])
+        elif isinstance(item, weibospider.items.HotBandItem):
+            return item
         try:
             self.cursor.execute(database)
             self.cursor.execute(sql2, data2)

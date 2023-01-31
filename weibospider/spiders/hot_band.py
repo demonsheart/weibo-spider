@@ -16,8 +16,6 @@ class HotBandSpider(scrapy.Spider):
             item = HotBandItem()
 
             item['num'] = band['num']
-            item['subject_querys'] = band['subject_querys']
-            item['subject_label'] = band['subject_label']
             item['word'] = band['word']
             item['onboard_time'] = band['onboard_time']
             item['raw_hot'] = band['raw_hot']
