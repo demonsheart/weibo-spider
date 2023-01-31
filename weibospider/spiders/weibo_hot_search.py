@@ -12,6 +12,9 @@ from weibospider.items import WeiboHotSearchItem, HotsearchUserInfoItem
 from weibospider.mytools.common import parse_time
 
 
+# TODO https://weibo.com/ajax/statuses/hot_band 爬取的同时把热门榜单存下来
+
+# feature - 爬取某个搜索结果
 # scrapy crawl weibo_hot_search -a max_page=5 -a reset_page=True
 class WeiboHotSearchSpider(scrapy.Spider):
     name = 'weibo_hot_search'
@@ -30,7 +33,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
         self.cache = Cache(r"weibospider/disk")
         if reset_page:
             self.cache.set(self.SAVED_PAGE_KEY, {key: 1 for key in self.key_words})
-        self.user_ids_pages = self.cache.get(self.SAVED_PAGE_KEY, default={key: 1 for key in self.key_words})
+        self.key_words_pages = self.cache.get(self.SAVED_PAGE_KEY, default={key: 1 for key in self.key_words})
         self.repost_ids_pages = self.cache.get(self.SAVED_REPOST_PAGE_KEY, default={})
 
         self.connect = pymysql.connect(
@@ -43,10 +46,10 @@ class WeiboHotSearchSpider(scrapy.Spider):
         self.cursor = self.connect.cursor()
 
     def start_requests(self):
-        for user_id in self.key_words:
-            hot_search_url = f'https://s.weibo.com/weibo?q={user_id}&page={self.user_ids_pages[user_id]}'
+        for key in self.key_words:
+            hot_search_url = f'https://s.weibo.com/weibo?q={key}&page={self.key_words_pages[key]}'
             yield scrapy.Request(hot_search_url, callback=self.parse,
-                                 meta={'user_id': user_id, 'page_num': self.user_ids_pages[user_id]})
+                                 meta={'user_id': key, 'page_num': self.key_words_pages[key]})
 
     def is_user_saved(self, user_id):
         database = 'use weibo_datas;'
@@ -123,12 +126,12 @@ class WeiboHotSearchSpider(scrapy.Spider):
             time.sleep(1)
             if self.max_page:  # max_page限制
                 if page_num <= int(self.max_page):
-                    self.user_ids_pages[user_id] = page_num
-                    self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
+                    self.key_words_pages[user_id] = page_num
+                    self.cache.set(self.SAVED_PAGE_KEY, self.key_words_pages)
                     yield Request(url, callback=self.parse, meta={'user_id': user_id, 'page_num': page_num})
             else:  # 无限制请求
-                self.user_ids_pages[user_id] = page_num
-                self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
+                self.key_words_pages[user_id] = page_num
+                self.cache.set(self.SAVED_PAGE_KEY, self.key_words_pages)
                 yield Request(url, callback=self.parse, meta={'user_id': user_id, 'page_num': page_num})
 
     def parse_repost(self, response):
@@ -179,6 +182,6 @@ class WeiboHotSearchSpider(scrapy.Spider):
         #             cc=["2509875617@qq.com"])
 
         # 同时记录当前的{userid : page} 下次启动入口时从page开始
-        self.cache.set(self.SAVED_PAGE_KEY, self.user_ids_pages)
+        self.cache.set(self.SAVED_PAGE_KEY, self.key_words_pages)
         self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_ids_pages)
         self.connect.close()
