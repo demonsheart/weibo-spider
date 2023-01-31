@@ -13,7 +13,7 @@ from weibospider.mytools.common import parse_time
 
 
 # feature - 爬取某个搜索结果
-# scrapy crawl weibo_hot_search -a key=#阳性感染者只咳嗽发烧算无症状吗# -a max_page=5 -a reset_page=True
+# scrapy crawl weibo_hot_search -a key="#阳性感染者只咳嗽发烧算无症状吗#" -a max_page=5 -a reset_page=True
 class WeiboHotSearchSpider(scrapy.Spider):
     name = 'weibo_hot_search'
     SAVED_PAGE_KEY = 'weibo_hot_search_downloaded_pages'
