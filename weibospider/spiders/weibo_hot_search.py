@@ -12,25 +12,25 @@ from weibospider.items import WeiboHotSearchItem, HotsearchUserInfoItem
 from weibospider.mytools.common import parse_time
 
 
-# TODO https://weibo.com/ajax/statuses/hot_band 爬取的同时把热门榜单存下来
-
 # feature - 爬取某个搜索结果
-# scrapy crawl weibo_hot_search -a max_page=5 -a reset_page=True
+# scrapy crawl weibo_hot_search -a key=#阳性感染者只咳嗽发烧算无症状吗# -a max_page=5 -a reset_page=True
 class WeiboHotSearchSpider(scrapy.Spider):
     name = 'weibo_hot_search'
     SAVED_PAGE_KEY = 'weibo_hot_search_downloaded_pages'
     SAVED_REPOST_PAGE_KEY = 'weibo_hot_search_repost_pages'
+
     # allowed_domains = ['s.weibo.com']
 
     # 1：#阳性感染者只咳嗽发烧算无症状吗#
     # 2：#二次感染新冠会更严重吗#
     # 3：#上班阳了算工伤吗#
-    key_words = [urllib.parse.quote('#阳性感染者只咳嗽发烧算无症状吗#')]
+    # key_words = [urllib.parse.quote('#阳性感染者只咳嗽发烧算无症状吗#')]
 
-    def __init__(self, max_page=None, reset_page=False, *args, **kwargs):
+    def __init__(self, max_page=None, reset_page=False, key='#阳性感染者只咳嗽发烧算无症状吗#', *args, **kwargs):
         super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
         self.max_page = max_page
         self.cache = Cache(r"weibospider/disk")
+        self.key_words = [urllib.parse.quote(key)]
         if reset_page:
             self.cache.set(self.SAVED_PAGE_KEY, {key: 1 for key in self.key_words})
         self.key_words_pages = self.cache.get(self.SAVED_PAGE_KEY, default={key: 1 for key in self.key_words})
@@ -64,11 +64,11 @@ class WeiboHotSearchSpider(scrapy.Spider):
         page_text = response.text
         # with open('first.html','w',encoding='utf-8') as fp:
         #     fp.write(page_text)
-        div_list = response.xpath('//div[@id="pl_feedlist_index"]//div[@class="card-wrap"]')[1:]
+        div_list = response.xpath('//div[@id="pl_feedlist_index"]//div[@action-type="feed_list_item"]')
         for div in div_list:
             item = WeiboHotSearchItem()
 
-            ttime = div.xpath(".//div[@class='from']/a[1]/text()").extract()
+            ttime = div.xpath(".//p[@class='from']/a[1]/text()").extract()
             ttime = ''.join(ttime)
             ttime = ttime.strip()
             # print("发布时间:", ttime)
@@ -82,24 +82,26 @@ class WeiboHotSearchSpider(scrapy.Spider):
             origin_weibo_content = origin_weibo_content.strip()
             # print("内容 : ",origin_weibo_content)
 
-            like_count = div.xpath(".//span[@class='woo-like-count']/text()").extract()  # 点赞数
-            like_count = like_count[0]
-            if "赞" in like_count:
-                like_count = "0"
+            like = div.xpath(".//a[@action-type='feed_list_like']/em/text()").extract()  # 点赞数
+            like_count = like if like else "0"
             # print("点赞数 : ",like_count)
 
             repost_count = div.xpath(".//a[@action-type='feed_list_forward']/text()").extract()  # 转发数
-            repost_count = repost_count[1]
-            if "转发" in repost_count:
-                repost_count = "0"
+            count_list = re.compile(r"\d+").findall(str(repost_count))
+            if len(count_list) == 0:
+                repost_count = '0'
+            else:
+                repost_count = str(count_list[0])
             # print("转发数 : ",repost_count)
 
-            orid = div.xpath(".//ul[@node-type='fl_menu_right']/li/a/@onclick").extract()  # 点赞数
-            orid = orid[0]
-            rule = re.compile(r"\d+")
-            orid = rule.findall(orid)
-            origin_weibo_id = orid[0]
-            origin_user_id = orid[1]
+            origin_weibo_id = div.xpath('./@mid').extract()[0]
+            # allowForward=1&mid=4856417351631314&name=玥X159&uid=2680492275.....
+            orid = div.xpath(".//a[@action-type='feed_list_forward']/@action-data").extract()
+            uid_list = re.compile(r"uid=(\d+)").findall(str(orid))
+            if len(uid_list) == 0:
+                origin_user_id = '-'
+            else:
+                origin_user_id = str(uid_list[0])
             # print("这是mid : ",origin_weibo_id)
             # print("这是uid : ",origin_user_id)
 
