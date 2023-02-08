@@ -131,7 +131,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             page_num += 1
             url = f"https://s.weibo.com/weibo?q={user_id}&page={page_num}"
             # weibo降低频率
-            time.sleep(0.5)
+            time.sleep(0.25)
             if self.max_page:  # max_page限制
                 if page_num <= int(self.max_page):
                     self.key_words_pages[user_id] = page_num
@@ -161,7 +161,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             mid, page_num = response.meta['mid'], response.meta['page_num']
             page_num += 1
             url = f"https://weibo.com/ajax/statuses/repostTimeline?id={mid}&page={page_num}&moduleID=feed"
-            if page_num <= 500:  # 转发推文请求限制页数 每页大概有20个数据
+            if page_num <= 1000:  # 转发推文请求限制页数 每页大概有20个数据
                 self.repost_ids_pages[mid] = page_num
                 self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_ids_pages)
                 yield Request(url, callback=self.parse_repost, meta={'mid': mid, 'page_num': page_num})
