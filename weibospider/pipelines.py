@@ -79,6 +79,7 @@ class WeibospiderPipeline:
         elif isinstance(item, weibospider.items.HotBandItem):
             return item
         try:
+            self.connect.ping(reconnect=True)
             self.cursor.execute(database)
             self.cursor.execute(sql2, data2)
             ret = self.cursor.fetchone()
@@ -89,6 +90,7 @@ class WeibospiderPipeline:
             else:
                 self.cursor.execute(sql, data)
                 self.connect.commit()
+            self.connect.commit()    
         except Exception as e:
             print('===============失败===============', e)
             self.connect.rollback()

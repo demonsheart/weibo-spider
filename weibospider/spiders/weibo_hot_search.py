@@ -27,7 +27,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
     # key_words = [urllib.parse.quote('#阳性感染者只咳嗽发烧算无症状吗#')]
 
     # def __init__(self, max_page=None, reset_page=False, key='#阳性感染者只咳嗽发烧算无症状吗#', *args, **kwargs):
-    def __init__(self, max_page=2, reset_page=True, *args, **kwargs):
+    def __init__(self, max_page=None, reset_page=True, *args, **kwargs):
         super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
          #读取热搜csv
         with open('hot_band.csv','r') as csvfile:
@@ -67,13 +67,13 @@ class WeiboHotSearchSpider(scrapy.Spider):
 
     def parse(self, response, **kwargs):
         page_text = response.text
-        # with open('first.html','w',encoding='utf-8') as fp:
-        #     fp.write(page_text)
+        with open('first.html','w',encoding='utf-8') as fp:
+            fp.write(page_text)
         div_list = response.xpath('//div[@id="pl_feedlist_index"]//div[@action-type="feed_list_item"]')
         for div in div_list:
             item = WeiboHotSearchItem()
 
-            ttime = div.xpath(".//p[@class='from']/a[1]/text()").extract()
+            ttime = div.xpath(".//div[@class='from']/a[1]/text()").extract()
             ttime = ''.join(ttime)
             ttime = ttime.strip()
             # print("发布时间:", ttime)
@@ -87,7 +87,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             origin_weibo_content = origin_weibo_content.strip()
             # print("内容 : ",origin_weibo_content)
 
-            like = div.xpath(".//a[@action-type='feed_list_like']/em/text()").extract()  # 点赞数
+            like = div.xpath(".//span[@class='woo-like-count']/text()").extract()  # 点赞数
             like_count = like if like else "0"
             # print("点赞数 : ",like_count)
 

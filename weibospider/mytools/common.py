@@ -54,7 +54,7 @@ def parse_time(date):
         date = ' '.join(r)
     if re.match('刚刚', date):
         date = time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))
-    if re.match('秒', date):
+    if re.match('\d+秒前', date):
         date = time.strftime('%Y-%m-%d %H:%M', time.localtime(time.time()))
     if re.match('\d+分钟前', date):
         minute = re.match('(\d+)', date).group(1)
