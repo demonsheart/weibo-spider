@@ -12,6 +12,8 @@ from weibospider.items import WeiboHotSearchItem, HotsearchUserInfoItem
 from weibospider.mytools.common import parse_time
 import csv
 from itertools import islice
+
+
 # feature - 爬取某个搜索结果
 # scrapy crawl weibo_hot_search -a key="#阳性感染者只咳嗽发烧算无症状吗#" -a max_page=5 -a reset_page=True
 class WeiboHotSearchSpider(scrapy.Spider):
@@ -26,13 +28,12 @@ class WeiboHotSearchSpider(scrapy.Spider):
     # 3：#上班阳了算工伤吗#
     # key_words = [urllib.parse.quote('#阳性感染者只咳嗽发烧算无症状吗#')]
 
-    # def __init__(self, max_page=None, reset_page=False, key='#阳性感染者只咳嗽发烧算无症状吗#', *args, **kwargs):
-    def __init__(self, max_page=2, reset_page=True, *args, **kwargs):
+    def __init__(self, max_page=None, reset_page=True, *args, **kwargs):
         super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
-         #读取热搜csv
-        with open('hot_band.csv','r') as csvfile:
+        # 读取热搜csv
+        with open('hot_band.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
-            keys = [row[9] for row in islice(reader,1,None)]
+            keys = [row[9] for row in islice(reader, 1, None)]
         self.max_page = max_page
         self.cache = Cache(r"weibospider/disk")
         self.key_words = [urllib.parse.quote(key) for key in keys]
