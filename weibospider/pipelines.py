@@ -25,7 +25,7 @@ class WeibospiderPipeline:
         self.cursor = self.connect.cursor()
 
     def process_item(self, item, spider):
-        database = 'use weibo_datas;'
+        # database = 'use weibo_datas;'
         if isinstance(item, weibospider.items.OriginWeiboItem):
             sql2 = 'select * from weibo where origin_weibo_id = %s'
             data2 = item['origin_weibo_id']
@@ -79,7 +79,7 @@ class WeibospiderPipeline:
         elif isinstance(item, weibospider.items.HotBandItem):
             return item
         try:
-            self.cursor.execute(database)
+            # self.cursor.execute(database)
             self.cursor.execute(sql2, data2)
             ret = self.cursor.fetchone()
             if ret:
