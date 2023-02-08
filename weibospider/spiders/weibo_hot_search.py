@@ -131,7 +131,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             page_num += 1
             url = f"https://s.weibo.com/weibo?q={user_id}&page={page_num}"
             # weibo降低频率
-            time.sleep(1)
+            time.sleep(0.5)
             if self.max_page:  # max_page限制
                 if page_num <= int(self.max_page):
                     self.key_words_pages[user_id] = page_num
