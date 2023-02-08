@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : server mysql
+ Source Server         : root_server
  Source Server Type    : MySQL
- Source Server Version : 80031
+ Source Server Version : 80031 (8.0.31)
  Source Host           : 175.178.248.178:3306
  Source Schema         : weibo_datas
 
  Target Server Type    : MySQL
- Target Server Version : 80031
+ Target Server Version : 80031 (8.0.31)
  File Encoding         : 65001
 
- Date: 05/12/2022 22:30:50
+ Date: 08/02/2023 10:09:23
 */
 
 SET NAMES utf8mb4;
@@ -22,6 +22,20 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `repost_weibo`;
 CREATE TABLE `repost_weibo` (
+  `repost_weibo_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `origin_weibo_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `origin_user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `repost_user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `repost_weibo_content` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `repost_publish_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`repost_weibo_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Table structure for repost_weibo_hotsearch
+-- ----------------------------
+DROP TABLE IF EXISTS `repost_weibo_hotsearch`;
+CREATE TABLE `repost_weibo_hotsearch` (
   `repost_weibo_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `origin_weibo_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `origin_user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
@@ -44,10 +58,36 @@ CREATE TABLE `user_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
+-- Table structure for user_info_hotsearch
+-- ----------------------------
+DROP TABLE IF EXISTS `user_info_hotsearch`;
+CREATE TABLE `user_info_hotsearch` (
+  `user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `friends_count` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `followers_count` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `statuses_count` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
 -- Table structure for weibo
 -- ----------------------------
 DROP TABLE IF EXISTS `weibo`;
 CREATE TABLE `weibo` (
+  `origin_weibo_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `origin_user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `origin_weibo_content` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `publish_time` datetime DEFAULT NULL,
+  `repost_count` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `like_count` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`origin_weibo_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- ----------------------------
+-- Table structure for weibo_hotsearch
+-- ----------------------------
+DROP TABLE IF EXISTS `weibo_hotsearch`;
+CREATE TABLE `weibo_hotsearch` (
   `origin_weibo_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `origin_user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `origin_weibo_content` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
