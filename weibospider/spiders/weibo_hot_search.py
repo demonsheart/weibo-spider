@@ -11,23 +11,15 @@ from weibospider.mytools.common import parse_time
 
 
 # feature - 爬取某个搜索结果
-# scrapy crawl weibo_hot_search -a max_page=5
+# scrapy crawl weibo_hot_search
 class WeiboHotSearchSpider(scrapy.Spider):
     name = 'weibo_hot_search'
     start_urls = ['https://weibo.com/ajax/statuses/hot_band']
 
     # allowed_domains = ['s.weibo.com']
 
-    def __init__(self, max_page=None, reset_page=True, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
-        self.connect = pymysql.connect(
-            host=private_setting.MYSQL_HOST,
-            db=private_setting.MYSQL_DATABASE,
-            user=private_setting.MYSQL_USERNAME,
-            passwd=private_setting.MYSQL_PASSWORD,
-            charset='utf8mb4'
-        )
-        self.cursor = self.connect.cursor()
 
     # def start_requests(self):
     #     yield scrapy.Request(start_urls, callback=self.parse)
@@ -46,15 +38,6 @@ class WeiboHotSearchSpider(scrapy.Spider):
                 hot_search_url = f'https://s.weibo.com/weibo?q={key}&page={1}'
                 yield scrapy.Request(hot_search_url, callback=self.parse_origin,
                                      meta={'user_id': key, 'page_num': 1})
-
-    # def is_user_saved(self, user_id):
-    #     database = 'use weibo_datas;'
-    #     sql = 'select * from user_info_hotsearch where user_id = %s'
-    #     data = user_id
-    #     self.cursor.execute(database)
-    #     self.cursor.execute(sql, data)
-    #     ret = self.cursor.fetchone()
-    #     return ret is not None
 
     def parse_origin(self, response):
         # page_text = response.text
@@ -133,8 +116,6 @@ class WeiboHotSearchSpider(scrapy.Spider):
             yield item
             # 对每一个转发的微博 请求其user信息
             user_id = str(bloc['user']['id'])
-            # 请求user信息
-            # if not self.is_user_saved(user_id):
             user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
             yield Request(user_url, callback=self.parse_user)
         # 如果还有数据 就尝试请求下一页数据
@@ -157,4 +138,4 @@ class WeiboHotSearchSpider(scrapy.Spider):
         yield item
 
     def close(self, reason):
-        self.connect.close()
+        pass
