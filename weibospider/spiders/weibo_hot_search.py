@@ -74,7 +74,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
         for div in div_list:
             item = WeiboHotSearchItem()
 
-            ttime = div.xpath(".//p[@class='from']/a[1]/text()").extract()
+            ttime = div.xpath(".//div[@class='from']/a[1]/text()").extract()
             ttime = ''.join(ttime)
             ttime = ttime.strip()
             # print("发布时间:", ttime)
@@ -111,7 +111,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             # print("这是mid : ",origin_weibo_id)
             # print("这是uid : ",origin_user_id)
 
-            # print('--------------------------------   ------------------- --------------- --------------- --------------- --------------- \n')
+            # print('--------------------------------   ------------------- ---------------- \n')
 
             item['origin_weibo_id'] = origin_weibo_id  # 源微博id
             item['origin_user_id'] = origin_user_id  # 源用户id
