@@ -15,7 +15,7 @@ from itertools import islice
 
 
 # feature - 爬取某个搜索结果
-# scrapy crawl weibo_hot_search -a key="#阳性感染者只咳嗽发烧算无症状吗#" -a max_page=5 -a reset_page=True
+# scrapy crawl weibo_hot_search -a max_page=5 -a reset_page=True
 class WeiboHotSearchSpider(scrapy.Spider):
     name = 'weibo_hot_search'
     SAVED_PAGE_KEY = 'weibo_hot_search_downloaded_pages'
@@ -33,7 +33,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
         # 读取热搜csv
         with open('hot_band.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
-            keys = [row[9] for row in islice(reader, 1, None)]
+            keys = [row[2] for row in islice(reader, 1, None)]
         self.max_page = max_page
         self.cache = Cache(r"weibospider/disk")
         self.key_words = [urllib.parse.quote(key) for key in keys]
@@ -131,7 +131,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             page_num += 1
             url = f"https://s.weibo.com/weibo?q={user_id}&page={page_num}"
             # weibo降低频率
-            time.sleep(0.25)
+            # time.sleep(0.25)
             if self.max_page:  # max_page限制
                 if page_num <= int(self.max_page):
                     self.key_words_pages[user_id] = page_num
