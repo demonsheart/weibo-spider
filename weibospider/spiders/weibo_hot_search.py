@@ -93,6 +93,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             yield item
 
             # 对每一个源微博 请求user信息
+            # TODO: 爬太快会被封
             user_url = f'https://weibo.com/ajax/profile/info?uid={origin_user_id}'
             yield Request(user_url, callback=self.parse_user)
 
@@ -118,6 +119,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             item = hot_search_parse_repost_bloc(bloc)
             yield item
             # 对每一个转发的微博 请求转发者的user信息
+            # TODO: 爬太快会被封
             user_id = str(bloc['user']['id'])
             user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
             yield Request(user_url, callback=self.parse_user)
