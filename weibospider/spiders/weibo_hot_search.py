@@ -1,11 +1,9 @@
 import scrapy
 import json
-import pymysql
 import re
 import urllib.parse
 from scrapy.http import Request
 from weibospider.mytools.common import hot_search_parse_repost_bloc
-from weibospider import private_setting
 from weibospider.items import WeiboHotSearchItem, HotsearchUserInfoItem
 from weibospider.mytools.common import parse_time
 
@@ -94,6 +92,11 @@ class WeiboHotSearchSpider(scrapy.Spider):
             item['like_count'] = like_count  # 点赞数
             yield item
 
+            # 对每一个源微博 请求user信息
+            user_url = f'https://weibo.com/ajax/profile/info?uid={origin_user_id}'
+            yield Request(user_url, callback=self.parse_user)
+
+            # 提交转发队列
             mid = origin_weibo_id
             repost_url = f'https://weibo.com/ajax/statuses/repostTimeline?id={mid}&page={1}&moduleID=feed'
             yield Request(repost_url, callback=self.parse_repost, meta={'page_num': 1, 'mid': mid})
@@ -114,7 +117,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
         for bloc in blocs:
             item = hot_search_parse_repost_bloc(bloc)
             yield item
-            # 对每一个转发的微博 请求其user信息
+            # 对每一个转发的微博 请求转发者的user信息
             user_id = str(bloc['user']['id'])
             user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
             yield Request(user_url, callback=self.parse_user)
