@@ -59,6 +59,30 @@ class HotsearchUserInfoItem(scrapy.Item):
     followers_count = scrapy.Field()  # 粉丝数
     statuses_count = scrapy.Field()  # 微博数
 
+class WeiboCityItem(scrapy.Item):
+    origin_weibo_id = scrapy.Field()  # 源微博id
+    origin_user_id = scrapy.Field()  # 源用户id
+    origin_weibo_content = scrapy.Field()  # 源微博文本内容
+    publish_time = scrapy.Field()  # 发布时间
+    repost_count = scrapy.Field()  # 转发数
+    like_count = scrapy.Field()  # 点赞数
+
+
+class CityRepostWeiboItem(scrapy.Item):
+    origin_weibo_id = scrapy.Field()  # 源微博id
+    origin_user_id = scrapy.Field()  # 源用户id
+    repost_weibo_id = scrapy.Field()  # 转发微博id
+    repost_user_id = scrapy.Field()  # 转发用户id
+    repost_weibo_content = scrapy.Field()  # 转发正文
+    repost_publish_time = scrapy.Field()  # 转发时间
+
+
+# 用户信息文件
+class CityUserInfoItem(scrapy.Item):
+    user_id = scrapy.Field()  # 用户id
+    friends_count = scrapy.Field()  # 关注数
+    followers_count = scrapy.Field()  # 粉丝数
+    statuses_count = scrapy.Field()  # 微博数
 
 class HotBandItem(scrapy.Item):
     num = scrapy.Field()  # id

@@ -9,9 +9,11 @@ from scrapy.http import Request
 from weibospider.mytools.common import hot_search_parse_repost_bloc
 from weibospider import private_setting
 from weibospider.items import WeiboHotSearchItem, HotsearchUserInfoItem
-from weibospider.mytools.common import parse_time
+from weibospider.mytools.common import parse_times
 import csv
 from itertools import islice
+from weibospider.items import HotBandItem
+
 # feature - 爬取某个搜索结果
 # scrapy crawl weibo_hot_search -a key="#阳性感染者只咳嗽发烧算无症状吗#" -a max_page=5 -a reset_page=True
 class WeiboHotSearchSpider(scrapy.Spider):
@@ -77,7 +79,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             ttime = ''.join(ttime)
             ttime = ttime.strip()
             # print("发布时间:", ttime)
-            publish_time = parse_time(ttime)
+            publish_time = parse_times(ttime)
             origin_weibo_content = div.xpath('.//p[@node-type="feed_list_content_full"]//text()').extract()  # 长文
             if origin_weibo_content:
                 pass

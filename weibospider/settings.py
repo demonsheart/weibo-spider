@@ -16,7 +16,7 @@ NEWSPIDER_MODULE = 'weibospider.spiders'
 RETRY_ENABLED = True
 RETRY_TIMES = 3
 RETRY_HTTP_CODES = [500, 503, 504, 400, 408]
-
+HTTPERROR_ALLOWED_CODES = [502]
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'weibospider (+http://www.yourdomain.com)'
 
