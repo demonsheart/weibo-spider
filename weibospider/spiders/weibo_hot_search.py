@@ -146,7 +146,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
         self.logger.info('Parse function called on %s', response.url)
         data = json.loads(response.text)
         blocs = data['data']
-        # print('转发测试  ------------------- --------------- --------------- --------------- --------------- \n')
+        print('转发测试  ------------------- --------------- --------------- --------------- --------------- \n')
         for bloc in blocs:
             item = hot_search_parse_repost_bloc(bloc)
             yield item
@@ -161,7 +161,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             mid, page_num = response.meta['mid'], response.meta['page_num']
             page_num += 1
             url = f"https://weibo.com/ajax/statuses/repostTimeline?id={mid}&page={page_num}&moduleID=feed"
-            if page_num <= 1000:  # 转发推文请求限制页数 每页大概有20个数据
+            if page_num <= 5000:  # 转发推文请求限制页数 每页大概有20个数据
                 self.repost_ids_pages[mid] = page_num
                 self.cache.set(self.SAVED_REPOST_PAGE_KEY, self.repost_ids_pages)
                 yield Request(url, callback=self.parse_repost, meta={'mid': mid, 'page_num': page_num})
