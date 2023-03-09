@@ -1,45 +1,18 @@
-# Define here the models for your spider middleware
-#
-# See documentation in:
-# https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+from scrapy import signals
+from .myextend import pro
 import random
 
-from scrapy import signals
 
-# useful for handling different item types with a single interface
-from itemadapter import is_item, ItemAdapter
-
-
-class IPProxyMiddleware(object):
-    """
-    代理IP中间件
-    """
-
-    @staticmethod
-    def fetch_proxy():
-        """
-        获取一个代理IP
-        """
-        # You need to rewrite this function if you want to add proxy pool
-        # the function should return an ip in the format of "ip:port" like "12.34.1.4:9090"
-        # ips = [
-        #     "127.0.0.1:7890",
-        # ]
-        # return random.choice(ips)
-        return None
-
+class ProxyDownloaderMiddleware:
     def process_request(self, request, spider):
-        """
-        将代理IP添加到request请求中
-        """
-        proxy_data = self.fetch_proxy()
-        if proxy_data:
-            current_proxy = f'http://{proxy_data}'
-            spider.logger.debug(f"current proxy:{current_proxy}")
-            request.meta['proxy'] = current_proxy
+        proxy = random.choice(pro.proxy_list)
 
-        # # Use the following lines if your proxy requires authentication
-        # proxy_user_pass = "USERNAME:PASSWORD"
-        # # setup basic authentication for the proxy
-        # encoded_user_pass = base64.encodestring(proxy_user_pass)
-        # request.headers['Proxy-Authorization'] = 'Basic ' + encoded_user_pass
+        # 用户名密码认证(私密代理/独享代理)
+        username = "t17838136409119"
+        password = "h6vksi39"
+        request.meta['proxy'] = "http://%(user)s:%(pwd)s@%(proxy)s/" % {"user": username, "pwd": password,
+                                                                        "proxy": proxy}
+
+        # 白名单认证(私密代理/独享代理)
+        # request.meta['proxy'] = "http://%(proxy)s/" % {"proxy": proxy}
+        return None

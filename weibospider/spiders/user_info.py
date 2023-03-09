@@ -3,6 +3,7 @@ import json
 from scrapy.http import Request
 from weibospider.items import UserInfoItem
 import time
+import base64
 
 
 class UserInfoSpider(scrapy.Spider):
@@ -14,14 +15,14 @@ class UserInfoSpider(scrapy.Spider):
 
     headers = {
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0",
+        "referer": "https://weibo.com",
     }
     cookies = [
-        # "XSRF-TOKEN=f1ylOXkszg_AP0lHTUabtbob; SUB=_2AkMTVcHXf8NxqwJRmP8dzGjgaIR3zwjEieKlCTAMJRMxHRl-yT92qmw9tRB6ONXvONBrvegUbIWoE_G9kQgjPgkYu5fj; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WF4caSRdfd-0bgiPHBzp40y; login_sid_t=24c75056b75b94ec66e86887484de8cd; cross_origin_proto=SSL; PPA_CI=8b3b7cf8cd9fcc8c6f3b6ef4b3aacdcb; _s_tentry=passport.weibo.com; Apache=3357902004956.5967.1678331617664; SINAGLOBAL=3357902004956.5967.1678331617664; ULV=1678331617668:1:1:1:3357902004956.5967.1678331617664:; wb_view_log=2560*14401; WBPSESS=5fStQf4aE0d6e7rh9d-P6iVkJJKQ7jNoHEp9VPgTJjpPVzxa0Znrfq9b7F84wp4U10i_ou9YxCDDhqxPMnt9tg0cpL_KHWDdn7dwXa-Z35RRP_EcluFRKtQ8aHGBcJjyFyrajr6Nwjvu4vkXn0fZ8AZSU1NNezX9dCxr_Hf0LtE=",
-        # "XSRF-TOKEN=f1ylOXkszg_AP0lHTUabtbob; login_sid_t=24c75056b75b94ec66e86887484de8cd; cross_origin_proto=SSL; PPA_CI=8b3b7cf8cd9fcc8c6f3b6ef4b3aacdcb; _s_tentry=passport.weibo.com; Apache=3357902004956.5967.1678331617664; SINAGLOBAL=3357902004956.5967.1678331617664; ULV=1678331617668:1:1:1:3357902004956.5967.1678331617664:; wb_view_log=2560*14401; SCF=Auboes_7CrdRZ4K6_J3TjCIKrFIZ0txQqXfRo_LZO0FTNcYX7yMRl_iZvcDcM7Ee48SGdZ6HURx1Ri1xsy7OsYo.; SUB=_2A25JDYgxDeRhGeFG61cY8ynPzzuIHXVqev75rDV8PUNbmtAfLWSkkW9Nfns5JRkb5dfOeGQUMOkgmx0lU-dnfT6n; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709911009; SSOLoginState=1678375009; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrL6gewegjYIlJbLr70G-Uly49vjzto_muyf6BswiEeyud_k_piH6YVKHyoStm3UaEIuf55FWb_UEjf2NV41VuNpKTr0z4AxWuMce3dCcBCWw==",
-        # "SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WFUhZPzXjKGWvmg4.wRlvEb5JpX5KMhUgL.Fo-4S0eReoqR1h.2dJLoIEBLxK.LBK-LB--LxKBLBonL12zLxK-LB.-L1h5LxKBLB.2L12zt; ALF=1680961538; SSOLoginState=1678369539; SCF=ApTiNa_W18ZQ_g0ULOsgHW5zl4VsHr4Oq4JxhFwIWOsMckiqNHApB6Xzmixqoe8lhMXNFagIljHlmB4GT_DyDns.; SUB=_2A25JDZNUDeRhGeNH7FEZ8ijEwzWIHXVqeoOcrDV8PUNbmtAfLVHQkW9NSp-OmSTS7E5KCigDX1tFpDECa6VhlkVS; XSRF-TOKEN=cJUloUmXVJszhTVOkUXz1Oz3; WBPSESS=Kk2oDI_W7tKQzED2TYhnVKdxFxtvMbQwZcAgWXiQpKYFy4B7803YXQu1S9xgM1qt9J0QVYQpYVMwcUWAgg83VBb9ADzMWfVzEYxpJ62TJeNpkm8Q6etCQXc_NV9AMPr1Jzq-uoFnM7-BbwctcuuLpw==",
-        # "SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WFUhZPzXjKGWvmg4.wRlvEb5JpX5KMhUgL.Fo-4S0eReoqR1h.2dJLoIEBLxK.LBK-LB--LxKBLBonL12zLxK-LB.-L1h5LxKBLB.2L12zt; ALF=1680961538; SSOLoginState=1678369539; SCF=ApTiNa_W18ZQ_g0ULOsgHW5zl4VsHr4Oq4JxhFwIWOsMckiqNHApB6Xzmixqoe8lhMXNFagIljHlmB4GT_DyDns.; SUB=_2A25JDZNUDeRhGeNH7FEZ8ijEwzWIHXVqeoOcrDV8PUNbmtAfLVHQkW9NSp-OmSTS7E5KCigDX1tFpDECa6VhlkVS; _s_tentry=-; Apache=2606992518245.235.1678374876720; SINAGLOBAL=2606992518245.235.1678374876720; ULV=1678374876725:1:1:1:2606992518245.235.1678374876720:",
-        # "XSRF-TOKEN=f1ylOXkszg_AP0lHTUabtbob; login_sid_t=24c75056b75b94ec66e86887484de8cd; cross_origin_proto=SSL; PPA_CI=8b3b7cf8cd9fcc8c6f3b6ef4b3aacdcb; _s_tentry=passport.weibo.com; Apache=3357902004956.5967.1678331617664; SINAGLOBAL=3357902004956.5967.1678331617664; ULV=1678331617668:1:1:1:3357902004956.5967.1678331617664:; wb_view_log=2560*14401; SCF=Auboes_7CrdRZ4K6_J3TjCIKrFIZ0txQqXfRo_LZO0FTNcYX7yMRl_iZvcDcM7Ee48SGdZ6HURx1Ri1xsy7OsYo.; SUB=_2A25JDYgxDeRhGeFG61cY8ynPzzuIHXVqev75rDV8PUNbmtAfLWSkkW9Nfns5JRkb5dfOeGQUMOkgmx0lU-dnfT6n; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709911009; SSOLoginState=1678375009; PC_TOKEN=a9180fd2b0; WBStorage=4d96c54e|undefined; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVMtwAk0JEfTTARDTrPSROI3LIb4PgHTNN7jJ8IRJEnt1F94H3FnGeIEDDAIRUOHXOmg6gRJop0t8LGcUCiH8q1A==",
-        "XSRF-TOKEN=aUw1LMFKZGNTq81dpvyBfStO; PC_TOKEN=21a21feb69; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WF458AwBcfoVsM6858YcZEN; WBPSESS=kErNolfXeoisUDB3d9TFH3aJZZYmdVeclbhSZ_BMFof4J9ahCbih9izHY3P6xZnaTHyTWQuTNiv0nGTV8a-22WqsXCteWeL87dWBLdcLpsvMQn6YweR1uxztKXjIWKwQ; PPA_CI=99c6b25db29ff5e24f03822c46ca5b21; SUB=_2AkMTVXJnf8NxqwJRmP4Qy2vmZIl_zg3EieKlCYO8JRMxHRl-yT9vqkYltRB6ONVciLZOrXoaDdsMs9rtoBwCRkK2ws_m; login_sid_t=df42d60fc072aaa458caef800663d1d8; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=135008431149.23944.1678376276394; SINAGLOBAL=135008431149.23944.1678376276394; ULV=1678376276397:1:1:1:135008431149.23944.1678376276394:; wb_view_log=2560*14401",
+        'XSRF-TOKEN=_FFO4YhiMmUtzHRNDzPezDbM; PC_TOKEN=5a5fccc4f3; login_sid_t=365e4ca48859984ff9ad828ed9be8544; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; PPA_CI=d0daeaa2f9f6a0cfea8bc665a83e9749; SCF=Auboes_7CrdRZ4K6_J3TjCIKrFIZ0txQqXfRo_LZO0FThdO7yesdOake1aOnvBjQzzkwe2MJITShpHUbGL1weC0.; SUB=_2A25JDmdKDeRhGeNH4lEW9inNzziIHXVqet-CrDV8PUNbmtAGLVL7kW9NSnAePV42zsfDqdztxi3aEDjyKadc43df; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WF.sG7_X0HX15pY5xDmTs5A5JpX5KzhUgL.Fo-41KeNSoMpShB2dJLoI0YLxKMLB.eL1KnLxKML1KBL1-qLxKMLB.eL1KnLxKML1h2LB-BLxKMLB.eL1KnLxK-LBo5LB.BLxKqL1K-LBKet; ALF=1709918874; SSOLoginState=1678382874; WBPSESS=kTzxXaFYfeELPFRjS_d8EHEAFHiaqY-3K1QrxDD54Yaq1jmuQ4auYnjWbn2d4uBI0F_kC7PNtN4-roHL5ORtoza0Y3RseceRMj2Vlqo3bIo1zZFB6lOS21pdbonLxaHSvizZMrhXpwr6mxJwQ8jj6w==',
+        'XSRF-TOKEN=_FFO4YhiMmUtzHRNDzPezDbM; PC_TOKEN=5a5fccc4f3; login_sid_t=365e4ca48859984ff9ad828ed9be8544; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; PPA_CI=d0daeaa2f9f6a0cfea8bc665a83e9749; SCF=Auboes_7CrdRZ4K6_J3TjCIKrFIZ0txQqXfRo_LZO0FThdO7yesdOake1aOnvBjQzzkwe2MJITShpHUbGL1weC0.; SUB=_2A25JDmdKDeRhGeNH4lEW9inNzziIHXVqet-CrDV8PUNbmtAGLVL7kW9NSnAePV42zsfDqdztxi3aEDjyKadc43df; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WF.sG7_X0HX15pY5xDmTs5A5JpX5KzhUgL.Fo-41KeNSoMpShB2dJLoI0YLxKMLB.eL1KnLxKML1KBL1-qLxKMLB.eL1KnLxKML1h2LB-BLxKMLB.eL1KnLxK-LBo5LB.BLxKqL1K-LBKet; ALF=1709918874; SSOLoginState=1678382874; WBPSESS=kTzxXaFYfeELPFRjS_d8EHEAFHiaqY-3K1QrxDD54YbWabiABdSktEHqEYA6uVy6hus1LwLBNPYmfxk_9-3f2MRep38z2Ff5zqE_RKSXd0ReMzhGGpdYkxzl00k-bVPfcnquHn4nlbq9PYGr9F2m1w==',
+        'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrL6gewegjYIlJbLr70G-Ul7er5RBPOL5wdKSJ0_HLIqCdDpY7MnwZ2Dg7hgP854A1qs1JBtu0SA414Dw16KUAyTJs5R8niQNRfj6steW1u3A==',
+        'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVMtwAk0JEfTTARDTrPSROI9LLmbOY3oCs7NgF6EsUMrtMYTfqbzFhn5xV78y3swOdVoKjXN7L1jkPBpYee-PfZg==',
+        'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVatvxqg0Hb_YZcE02Ecyih9nCfAj3ahboWhwNboPEZYzsl-G-At2T7l2eesro3YFd7t7DqX4fOHRwZ7mgdw-l0g=='
     ]
     ips = [
         '127.0.0.1:7890',
@@ -35,16 +36,17 @@ class UserInfoSpider(scrapy.Spider):
         uids = ['6239620007'] * 1000  # 生成1000条
         start_urls = [f'{self.base_url}?uid={uid}' for uid in uids]
         for url in start_urls:
-            time.sleep(0.1)  # 提交延迟
+            time.sleep(0.1)  # 提交延迟 实测最小值0.2 再小会414
             self.count += 1
             cookie_idx = self.count % len(self.cookies)
             self.headers["cookie"] = self.cookies[cookie_idx]
-            cur_ip = f'http://{self.ips[self.count % len(self.ips)]}'
-            # 使用代理
-            yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True, meta={'proxy': cur_ip})
 
-            # 不使用代理
-            # yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True)
+            # 使用本机代理
+            # cur_ip = f'http://{self.ips[self.count % len(self.ips)]}'
+            # yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True, meta={'proxy': cur_ip})
+
+            # 不使用代理（通过全局代理） IPProxyMiddleware
+            yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True)
 
     def parse(self, response):
         data = json.loads(response.text)
