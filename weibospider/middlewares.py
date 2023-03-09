@@ -2,6 +2,7 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import random
 
 from scrapy import signals
 
@@ -21,6 +22,10 @@ class IPProxyMiddleware(object):
         """
         # You need to rewrite this function if you want to add proxy pool
         # the function should return an ip in the format of "ip:port" like "12.34.1.4:9090"
+        # ips = [
+        #     "127.0.0.1:7890",
+        # ]
+        # return random.choice(ips)
         return None
 
     def process_request(self, request, spider):
@@ -32,3 +37,9 @@ class IPProxyMiddleware(object):
             current_proxy = f'http://{proxy_data}'
             spider.logger.debug(f"current proxy:{current_proxy}")
             request.meta['proxy'] = current_proxy
+
+        # # Use the following lines if your proxy requires authentication
+        # proxy_user_pass = "USERNAME:PASSWORD"
+        # # setup basic authentication for the proxy
+        # encoded_user_pass = base64.encodestring(proxy_user_pass)
+        # request.headers['Proxy-Authorization'] = 'Basic ' + encoded_user_pass
