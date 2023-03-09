@@ -131,3 +131,4 @@ dmypy.json
 *.DS_Store
 cookie_private.txt
 private_setting.py
+/weibospider/disk

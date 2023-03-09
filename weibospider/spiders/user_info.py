@@ -24,9 +24,6 @@ class UserInfoSpider(scrapy.Spider):
         'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVMtwAk0JEfTTARDTrPSROI9LLmbOY3oCs7NgF6EsUMrtMYTfqbzFhn5xV78y3swOdVoKjXN7L1jkPBpYee-PfZg==',
         'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVatvxqg0Hb_YZcE02Ecyih9nCfAj3ahboWhwNboPEZYzsl-G-At2T7l2eesro3YFd7t7DqX4fOHRwZ7mgdw-l0g=='
     ]
-    ips = [
-        '127.0.0.1:7890',
-    ]
     count = 0
 
     def __init__(self, *args, **kwargs):
@@ -36,16 +33,16 @@ class UserInfoSpider(scrapy.Spider):
         uids = ['6239620007'] * 1000  # 生成1000条
         start_urls = [f'{self.base_url}?uid={uid}' for uid in uids]
         for url in start_urls:
-            time.sleep(0.1)  # 提交延迟 实测最小值0.2 再小会414
+            # time.sleep(0.1)  # 提交延迟 实测最小值0.2 再小会414
             self.count += 1
             cookie_idx = self.count % len(self.cookies)
             self.headers["cookie"] = self.cookies[cookie_idx]
 
             # 使用本机代理
-            # cur_ip = f'http://{self.ips[self.count % len(self.ips)]}'
+            # cur_ip = f'http://127.0.0.1:7890'
             # yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True, meta={'proxy': cur_ip})
 
-            # 不使用代理（通过全局代理） IPProxyMiddleware
+            # 默认走通过全局代理
             yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True)
 
     def parse(self, response):
@@ -53,13 +50,13 @@ class UserInfoSpider(scrapy.Spider):
         ok = bool(data['ok'])
         if ok:
             print(data['data'])
-            # bloc = data['data']
-            # item = UserInfoItem()
-            # item['user_id'] = str(bloc['user']['id'])  # 源微博id
-            # item['friends_count'] = str(bloc['user']['friends_count'])  # 关注数
-            # item['followers_count'] = str(bloc['user']['followers_count'])  # 粉丝数
-            # item['statuses_count'] = str(bloc['user']['statuses_count'])  # 微博数
-            # yield item
+            bloc = data['data']
+            item = UserInfoItem()
+            item['user_id'] = str(bloc['user']['id'])  # 源微博id
+            item['friends_count'] = str(bloc['user']['friends_count'])  # 关注数
+            item['followers_count'] = str(bloc['user']['followers_count'])  # 粉丝数
+            item['statuses_count'] = str(bloc['user']['statuses_count'])  # 微博数
+            yield item
         else:
             print(data)
             pass

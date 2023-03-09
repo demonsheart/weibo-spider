@@ -1,5 +1,6 @@
 from scrapy import signals
 from .myextend import pro
+from weibospider import private_setting
 import random
 
 
@@ -8,8 +9,8 @@ class ProxyDownloaderMiddleware:
         proxy = random.choice(pro.proxy_list)
 
         # 用户名密码认证(私密代理/独享代理)
-        username = "t17838136409119"
-        password = "h6vksi39"
+        username = private_setting.PROXY_USERNAME
+        password = private_setting.PROXY_PASSWORD
         request.meta['proxy'] = "http://%(user)s:%(pwd)s@%(proxy)s/" % {"user": username, "pwd": password,
                                                                         "proxy": proxy}
 
