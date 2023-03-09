@@ -15,15 +15,9 @@ MYSQL_USERNAME = 'xxx'
 MYSQL_PASSWORD = 'xxx'
 MYSQL_PORT = 'xxx'
 
-
-# email 这个可以不用填 当初调用邮箱服务留下来的
-MAIL_FROM = "xxx"
-MAIL_HOST = 'xxx'
-MAIL_PORT = 25
-MAIL_USER = 'xxx'
-MAIL_PASS = 'xxx'
-MAIL_TLS = False
-MAIL_SSL = False
+# 快代理配置
+PROXY_USERNAME = "xxx"
+PROXY_PASSWORD = "xxx"
 ```
 
 4. run
