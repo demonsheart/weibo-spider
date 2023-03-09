@@ -35,18 +35,18 @@ ROBOTSTXT_OBEY = False
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-# COOKIES_ENABLED = False
+COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-with open('weibospider/cookie.txt', 'rt', encoding='utf-8') as f:
-    cookie = f.read().strip()
-DEFAULT_REQUEST_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0',
-    'Cookie': cookie
-}
+# with open('weibospider/cookie.txt', 'rt', encoding='utf-8') as f:
+#     cookie = f.read().strip()
+# DEFAULT_REQUEST_HEADERS = {
+#     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0',
+#     'Cookie': cookie
+# }
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
