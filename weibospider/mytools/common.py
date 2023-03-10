@@ -86,7 +86,4 @@ def parse_long_bloc(response):
     data = json.loads(response.text)['data']
     item = response.meta['item']
     item['origin_weibo_content'] = data['longTextContent']
-    print("========LongText=========")
-    print(item)
-    print("\n\n")
     yield item

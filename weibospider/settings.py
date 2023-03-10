@@ -29,24 +29,24 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 1
+# DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-# with open('weibospider/cookie.txt', 'rt', encoding='utf-8') as f:
-#     cookie = f.read().strip()
-# DEFAULT_REQUEST_HEADERS = {
-#     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0',
-#     'Cookie': cookie
-# }
+with open('weibospider/cookie.txt', 'rt', encoding='utf-8') as f:
+    cookie = f.read().strip()
+DEFAULT_REQUEST_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0',
+    'Cookie': cookie
+}
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
@@ -57,18 +57,18 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    # 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': None,
-    # 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 101,
-    # 'weibospider.middlewares.ProxyDownloaderMiddleware': 100, #  代理
+    'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': None,
+    'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 101,
+    'weibospider.middlewares.ProxyDownloaderMiddleware': 100,  # 代理
 }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #  代理
-# EXTENSIONS = {
-#     'weibospider.myextend.MyExtend': 300,
-# }
+EXTENSIONS = {
+    'weibospider.myextend.MyExtend': 300,
+}
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
