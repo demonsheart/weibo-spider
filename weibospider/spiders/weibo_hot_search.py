@@ -68,8 +68,8 @@ class WeiboHotSearchSpider(scrapy.Spider):
         div_list = response.xpath('//div[@id="pl_feedlist_index"]//div[@action-type="feed_list_item"]')
         for div in div_list:
             item = WeiboHotSearchItem()
-
-            ttime = div.xpath(".//div[@class='from']/a[1]/text()").extract()
+            # 时间标签可能是div / p
+            ttime = div.xpath("(.//p[@class='from']/a[1]/text())|(.//div[@class='from']/a[1]/text())").extract()
             ttime = ''.join(ttime)
             ttime = ttime.strip()
             # print("发布时间:", ttime)
