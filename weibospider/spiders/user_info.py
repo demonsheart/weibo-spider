@@ -3,7 +3,6 @@ import json
 from scrapy.http import Request
 from weibospider.items import UserInfoItem
 import time
-import base64
 
 
 class UserInfoSpider(scrapy.Spider):
@@ -33,7 +32,7 @@ class UserInfoSpider(scrapy.Spider):
         uids = ['6239620007'] * 1000  # 生成1000条
         start_urls = [f'{self.base_url}?uid={uid}' for uid in uids]
         for url in start_urls:
-            # time.sleep(0.1)  # 提交延迟 实测最小值0.2 再小会414
+            # time.sleep(0.2)  # 提交延迟 实测最小值0.2 再小会414
             self.count += 1
             cookie_idx = self.count % len(self.cookies)
             self.headers["cookie"] = self.cookies[cookie_idx]

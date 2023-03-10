@@ -1,7 +1,10 @@
+import random
+
 import scrapy
 import json
 import re
 import urllib.parse
+import copy
 from scrapy.http import Request
 from weibospider.mytools.common import hot_search_parse_repost_bloc
 from weibospider.items import WeiboHotSearchItem, HotsearchUserInfoItem
@@ -16,6 +19,21 @@ class WeiboHotSearchSpider(scrapy.Spider):
 
     # allowed_domains = ['s.weibo.com']
 
+    base_headers = {
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0",
+        "referer": "https://weibo.com",
+    }
+
+    # weibo与user需要cookie repost则不需要
+    cookies = [
+        'XSRF-TOKEN=_FFO4YhiMmUtzHRNDzPezDbM; PC_TOKEN=5a5fccc4f3; login_sid_t=365e4ca48859984ff9ad828ed9be8544; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; PPA_CI=d0daeaa2f9f6a0cfea8bc665a83e9749; SCF=Auboes_7CrdRZ4K6_J3TjCIKrFIZ0txQqXfRo_LZO0FThdO7yesdOake1aOnvBjQzzkwe2MJITShpHUbGL1weC0.; SUB=_2A25JDmdKDeRhGeNH4lEW9inNzziIHXVqet-CrDV8PUNbmtAGLVL7kW9NSnAePV42zsfDqdztxi3aEDjyKadc43df; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WF.sG7_X0HX15pY5xDmTs5A5JpX5KzhUgL.Fo-41KeNSoMpShB2dJLoI0YLxKMLB.eL1KnLxKML1KBL1-qLxKMLB.eL1KnLxKML1h2LB-BLxKMLB.eL1KnLxK-LBo5LB.BLxKqL1K-LBKet; ALF=1709918874; SSOLoginState=1678382874; WBPSESS=kTzxXaFYfeELPFRjS_d8EHEAFHiaqY-3K1QrxDD54Yaq1jmuQ4auYnjWbn2d4uBI0F_kC7PNtN4-roHL5ORtoza0Y3RseceRMj2Vlqo3bIo1zZFB6lOS21pdbonLxaHSvizZMrhXpwr6mxJwQ8jj6w==',
+        'XSRF-TOKEN=_FFO4YhiMmUtzHRNDzPezDbM; PC_TOKEN=5a5fccc4f3; login_sid_t=365e4ca48859984ff9ad828ed9be8544; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; PPA_CI=d0daeaa2f9f6a0cfea8bc665a83e9749; SCF=Auboes_7CrdRZ4K6_J3TjCIKrFIZ0txQqXfRo_LZO0FThdO7yesdOake1aOnvBjQzzkwe2MJITShpHUbGL1weC0.; SUB=_2A25JDmdKDeRhGeNH4lEW9inNzziIHXVqet-CrDV8PUNbmtAGLVL7kW9NSnAePV42zsfDqdztxi3aEDjyKadc43df; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WF.sG7_X0HX15pY5xDmTs5A5JpX5KzhUgL.Fo-41KeNSoMpShB2dJLoI0YLxKMLB.eL1KnLxKML1KBL1-qLxKMLB.eL1KnLxKML1h2LB-BLxKMLB.eL1KnLxK-LBo5LB.BLxKqL1K-LBKet; ALF=1709918874; SSOLoginState=1678382874; WBPSESS=kTzxXaFYfeELPFRjS_d8EHEAFHiaqY-3K1QrxDD54YbWabiABdSktEHqEYA6uVy6hus1LwLBNPYmfxk_9-3f2MRep38z2Ff5zqE_RKSXd0ReMzhGGpdYkxzl00k-bVPfcnquHn4nlbq9PYGr9F2m1w==',
+        'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrL6gewegjYIlJbLr70G-Ul7er5RBPOL5wdKSJ0_HLIqCdDpY7MnwZ2Dg7hgP854A1qs1JBtu0SA414Dw16KUAyTJs5R8niQNRfj6steW1u3A==',
+        'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVMtwAk0JEfTTARDTrPSROI9LLmbOY3oCs7NgF6EsUMrtMYTfqbzFhn5xV78y3swOdVoKjXN7L1jkPBpYee-PfZg==',
+        'XSRF-TOKEN=l0KmKUrqlCdVfCH_p5Ocyrae; PC_TOKEN=fae474401d; login_sid_t=e3716e00e7d8da9e1727b104b7345aba; cross_origin_proto=SSL; WBStorage=4d96c54e|undefined; _s_tentry=passport.weibo.com; Apache=9506464120689.297.1678383053107; SINAGLOBAL=9506464120689.297.1678383053107; ULV=1678383053110:1:1:1:9506464120689.297.1678383053107:; wb_view_log=1512*9822; SUB=_2A25JDme6DeRhGeFG61cY8ynPzzuIHXVqet5yrDV8PUNbmtANLVPYkW9Nfns5JT8mIVf-lCnecrHLrgVubGrTkMLp; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9Wh2cqyzWB5Y4.VnBuB4ySmB5JpX5KzhUgL.FoMReh-4e0M0ShM2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMN1h5f1KeNe0BN; ALF=1709919081; SSOLoginState=1678383082; WBPSESS=RG7REZfowQtB4h7VOHh181o8rYucmnnCQpbrRryYKBrUXXf6XXjjxswMFrC4EAjVatvxqg0Hb_YZcE02Ecyih9nCfAj3ahboWhwNboPEZYzsl-G-At2T7l2eesro3YFd7t7DqX4fOHRwZ7mgdw-l0g=='
+    ]
+    user_count = 0
+
     def __init__(self, *args, **kwargs):
         super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
 
@@ -27,6 +45,12 @@ class WeiboHotSearchSpider(scrapy.Spider):
     #     yield scrapy.Request(hot_search_url, callback=self.parse,
     #                          meta={'user_id': key, 'page_num': self.key_words_pages[key]})
 
+    # weibo与user使用cookie池
+    def generate_cookie_header(self):
+        headers = copy.deepcopy(self.base_headers)
+        headers['cookie'] = random.choice(self.cookies)
+        return headers
+
     def parse(self, response):
         data = json.loads(response.text)
         band_list = data['data']['band_list']
@@ -34,7 +58,7 @@ class WeiboHotSearchSpider(scrapy.Spider):
             if 'word_scheme' in band:
                 key = urllib.parse.quote(band['word_scheme'])
                 hot_search_url = f'https://s.weibo.com/weibo?q={key}&page={1}'
-                yield scrapy.Request(hot_search_url, callback=self.parse_origin,
+                yield scrapy.Request(hot_search_url, callback=self.parse_origin, headers=self.generate_cookie_header(),
                                      meta={'user_id': key, 'page_num': 1})
 
     def parse_origin(self, response):
@@ -93,9 +117,8 @@ class WeiboHotSearchSpider(scrapy.Spider):
             yield item
 
             # 对每一个源微博 请求user信息
-            # TODO: 爬太快会被封
             user_url = f'https://weibo.com/ajax/profile/info?uid={origin_user_id}'
-            yield Request(user_url, callback=self.parse_user)
+            yield Request(user_url, headers=self.generate_cookie_header(), callback=self.parse_user)
 
             # 提交转发队列
             mid = origin_weibo_id
@@ -108,7 +131,8 @@ class WeiboHotSearchSpider(scrapy.Spider):
         # weibo降低频率
         # time.sleep(0.25)
         if page_num <= 50:
-            yield Request(url, callback=self.parse_origin, meta={'user_id': user_id, 'page_num': page_num})
+            yield Request(url, callback=self.parse_origin, headers=self.generate_cookie_header(),
+                          meta={'user_id': user_id, 'page_num': page_num})
 
     def parse_repost(self, response):
         self.logger.info('Parse function called on %s', response.url)
@@ -119,10 +143,9 @@ class WeiboHotSearchSpider(scrapy.Spider):
             item = hot_search_parse_repost_bloc(bloc)
             yield item
             # 对每一个转发的微博 请求转发者的user信息
-            # TODO: 爬太快会被封
             user_id = str(bloc['user']['id'])
             user_url = f'https://weibo.com/ajax/profile/info?uid={user_id}'
-            yield Request(user_url, callback=self.parse_user)
+            yield Request(user_url, headers=self.generate_cookie_header(), callback=self.parse_user)
         # 如果还有数据 就尝试请求下一页数据
         if len(blocs) > 0:
             mid, page_num = response.meta['mid'], response.meta['page_num']
