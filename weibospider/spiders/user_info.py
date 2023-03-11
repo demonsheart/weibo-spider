@@ -12,23 +12,28 @@ class UserInfoSpider(scrapy.Spider):
     base_url = "https://weibo.com/ajax/profile/info"  # 微博的接口
     # https://weibo.com/ajax/profile/info?uid=6239439310
 
-    count = 0
+    # 轮次
+    rounds = 5
 
     def __init__(self, *args, **kwargs):
         super(UserInfoSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
-        uids = ['6239620007'] * 1000  # 生成1000条
+        uids = ['6239620007'] * 50  # 生成50条
         start_urls = [f'{self.base_url}?uid={uid}' for uid in uids]
-        for url in start_urls:
-            # time.sleep(0.2)  # 提交延迟 实测最小值0.2 再小会414
-            self.count += 1
-            # 使用本机代理
-            # cur_ip = f'http://127.0.0.1:7890'
-            # yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True, meta={'proxy': cur_ip})
+        cur_round = 0
+        while self.rounds > cur_round:
+            cur_round += 1
+            print(f"===========第{cur_round}轮============")
+            for url in start_urls:
+                # 使用本机代理
+                # cur_ip = f'http://127.0.0.1:7890'
+                # yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True, meta={'proxy': cur_ip})
 
-            # 默认走通过全局代理
-            yield Request(url, callback=self.parse, dont_filter=True)
+                # 默认走通过全局代理
+                yield Request(url, callback=self.parse, dont_filter=True)
+            # 每一分钟提交一次
+            time.sleep(10)
 
     def parse(self, response, **kwargs):
         data = json.loads(response.text)
