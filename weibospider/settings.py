@@ -66,9 +66,9 @@ DOWNLOADER_MIDDLEWARES = {
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #  代理
-EXTENSIONS = {
-    'weibospider.myextend.MyExtend': 300,
-}
+# EXTENSIONS = {
+#     'weibospider.myextend.MyExtend': 300,
+# }
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html

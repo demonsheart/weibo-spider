@@ -1,12 +1,14 @@
-from scrapy import signals
-from .myextend import pro
+# from .myextend import pro
+# import random
 from weibospider import private_setting
-import random
 
 
 class ProxyDownloaderMiddleware:
     def process_request(self, request, spider):
-        proxy = random.choice(pro.proxy_list)
+        # proxy = random.choice(pro.proxy_list)
+
+        # 隧道代理固定服务器 无需提取代理
+        proxy = 'd393.kdltps.com: 15818'
 
         # 用户名密码认证(私密代理/独享代理)
         username = private_setting.PROXY_USERNAME

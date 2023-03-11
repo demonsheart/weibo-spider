@@ -15,12 +15,7 @@ class Proxy:
 
     def __init__(self, ):
         # 提取proxy_list
-        # self._proxy_list = requests.get(api_url).json().get('data').get('proxy_list')
-
-        # 隧道代理无需提取
-        self._proxy_list = [
-            'd393.kdltps.com: 15818'
-        ]
+        self._proxy_list = requests.get(api_url).json().get('data').get('proxy_list')
 
     @property
     def proxy_list(self):
