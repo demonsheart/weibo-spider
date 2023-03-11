@@ -7,7 +7,7 @@ import requests
 from scrapy import signals
 
 # 提取代理IP的api
-api_url = 'https://tps.kdlapi.com/api/gettps/?secret_id=oobs1o7owxpec7r3dffz&num=1&signature=op61mwtaj5r7ykziebuh4bgwls&pt=1&format=json&sep=1'
+api_url = 'https://tps.kdlapi.com/api/gettps/?secret_id=oobs1o7owxpec7r3dffz&num=1&signature=otg429bc3imtfhvuahdcre6wdz&pt=1&format=json&sep=1'
 foo = True
 
 
