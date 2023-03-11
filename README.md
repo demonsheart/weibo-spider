@@ -31,3 +31,10 @@ scrapy crawl origin_weibo # 代码里是爬取深圳大学下的所有微博
 
 爬取某个话题下面的推文和转发 -- weibo_hot_search.py
 > scrapy crawl weibo_hot_search
+
+
+部署
+```bash
+scrapyd-deploy -l
+scrapyd-deploy TencentCloud -p weibospider
+```
