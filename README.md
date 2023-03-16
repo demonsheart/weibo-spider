@@ -37,4 +37,5 @@ scrapy crawl origin_weibo # 代码里是爬取深圳大学下的所有微博
 ```bash
 scrapyd-deploy -l
 scrapyd-deploy TencentCloud -p weibospider
+curl http://localhost:6800/schedule.json -d project=default -d spider=somespider
 ```
