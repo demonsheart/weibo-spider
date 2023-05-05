@@ -27,7 +27,6 @@ class OriginWeiboSpider(scrapy.Spider):
         super(OriginWeiboSpider, self).__init__(*args, **kwargs)
         self.max_page = max_page
 
-        # TODO 目前是通过项目的disk下的db缓存当前的page_num 这需要每次都更新本地的disk 这里可以使用云redis优化
         # 根据cache初始化user_ids_pages 从上一次失败的page开始爬起
         self.cache = Cache(r"weibospider/disk")
         if reset_page:

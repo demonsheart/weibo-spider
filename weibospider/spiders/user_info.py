@@ -1,9 +1,7 @@
 import scrapy
 import json
 from scrapy.http import Request
-from twisted.internet import defer, reactor
 from weibospider.items import UserInfoItem
-import time
 
 
 class UserInfoSpider(scrapy.Spider):
