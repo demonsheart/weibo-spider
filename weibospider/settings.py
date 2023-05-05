@@ -29,7 +29,7 @@ ROBOTSTXT_OBEY = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 1
+DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -41,9 +41,11 @@ COOKIES_ENABLED = True
 # TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
+with open('weibospider/cookie', 'rt', encoding='utf-8') as f:
+    cookie = f.read().strip()
 DEFAULT_REQUEST_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:61.0) Gecko/20100101 Firefox/61.0',
-    'Cookie': 'XSRF-TOKEN=4K-zT4Etlbg8ooeIsDO9cVuU; SUB=_2A25JFY8SDeRhGeNH4lEW9inNzziIHXVqYufarDV8PUNbmtAGLWvukW9NSnAePaIbWEjjei8FowIU8vp_SKft7RIM; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WF.sG7_X0HX15pY5xDmTs5A5JpX5KzhUgL.Fo-41KeNSoMpShB2dJLoI0YLxKMLB.eL1KnLxKML1KBL1-qLxKMLB.eL1KnLxKML1h2LB-BLxKMLB.eL1KnLxK-LBo5LB.BLxKqL1K-LBKet; ALF=1710437058; SSOLoginState=1678901058; WBPSESS=kTzxXaFYfeELPFRjS_d8EHEAFHiaqY-3K1QrxDD54Yaq1jmuQ4auYnjWbn2d4uBI0F_kC7PNtN4-roHL5ORto4H52N1c0T9SUC6Gsq65577dDFaheFni0y2mRZWwxBoeW5-otl7jAif3uDdeXVNhCA==',
+    'Cookie': cookie
 }
 
 # Enable or disable spider middlewares
@@ -58,12 +60,12 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.cookies.CookiesMiddleware': None,
     'scrapy.downloadermiddlewares.redirect.RedirectMiddleware': None,
     'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 101,
-    'weibospider.middlewares.ProxyDownloaderMiddleware': 100,  # 代理
+    # 'weibospider.middlewares.ProxyDownloaderMiddleware': 100,  # 隧道代理
 }
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
-#  代理
+#  隧道代理
 # EXTENSIONS = {
 #     'weibospider.myextend.MyExtend': 300,
 # }

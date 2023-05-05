@@ -1,3 +1,5 @@
+import time
+
 import pymysql
 import scrapy
 import json
@@ -52,6 +54,7 @@ class GetUncatchedUserSpider(scrapy.Spider):
                 # yield Request(url, callback=self.parse, headers=self.headers, dont_filter=True, meta={'proxy': cur_ip})
 
                 # 默认走通过全局代理
+                time.sleep(0.2)
                 yield Request(url, callback=self.parse, dont_filter=True)
 
     def parse(self, response, **kwargs):

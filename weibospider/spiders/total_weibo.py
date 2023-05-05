@@ -10,13 +10,13 @@ from weibospider.mytools.common import parse_time
 
 # feature - 爬取某个搜索结果
 # scrapy crawl weibo_hot_search
-class WeiboHotSearchSpider(scrapy.Spider):
-    name = 'weibo_hot_search'
+class TotalWeiboHotSearchSpider(scrapy.Spider):
+    name = 'total_weibo'
 
     # allowed_domains = ['s.weibo.com']
 
     def __init__(self, *args, **kwargs):
-        super(WeiboHotSearchSpider, self).__init__(*args, **kwargs)
+        super(TotalWeiboHotSearchSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
         hot_band_url = 'https://weibo.com/ajax/statuses/hot_band'
